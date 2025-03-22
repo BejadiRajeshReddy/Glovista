@@ -1,0 +1,226 @@
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  Pagination, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Button as MuiButton
+} from "@mui/material";
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
+import SideBar from '../SideBar/SideBar';
+import {
+  Dialog, DialogHeader, DialogBody, DialogFooter, Button,
+  Typography, Input,Switch
+} from "@material-tailwind/react";
+import {
+  getCategoryData, getProductData, getProductDataById, postProductsData,
+  updateProductData
+} from '../../../Api/AdminApi';
+import { toast, ToastContainer } from 'react-toastify';
+
+function Product() {
+  const [formData, setFormData] = useState({
+    product_name: "",
+    product_category: "",
+    product_price: "",
+    product_count: "",
+    product_offer: "",
+    product_description: "",
+    product_status : true,
+  });
+  const [fetchCategory, setFetchCategory] = useState([]);
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [productList, setProductList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [updateOpen,setUpdateOpen] = useState(false)
+  const [productId,setProductId] = useState(null)
+  const [isEditMode, setIsEditMode] = useState(false);
+
+
+  const handleOpen = () => setOpen(!open);
+//   const updateOpenModal = () => setUpdateOpen((cur) => !cur)
+
+  
+  const rowsPerPage = 5;
+
+  // Fetch categories and product list once
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const categoryData = await getCategoryData();
+        setFetchCategory(categoryData.map(category => ({
+          id: category.id, name: category.category_name
+        })));
+        
+        const products = await getProductData();
+        setProductList(products);
+      } catch (error) {
+        console.error("An error occurred while fetching data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setImages(selectedFiles);
+    setPreviews(selectedFiles.map(file => URL.createObjectURL(file)));
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    const formDataObj = new FormData();
+    Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
+    images.forEach((file) => formDataObj.append("uploaded_images", file));
+    formDataObj.append("product_status", true);
+
+    try {
+      await postProductsData(formDataObj);
+      toast.success('Uploaded Product Successfully!');
+      resetForm();
+    } catch (error) {
+      toast.error('Error uploading product!');
+    }
+  };
+
+  
+
+  const resetForm = () => {
+    setFormData({
+      product_name: "",
+      product_category: "",
+      product_price: "",
+      product_count: "",
+      product_offer: "",
+      product_description: "",
+      product_status : false
+    });
+    setImages([]);
+    setPreviews([]);
+    setOpen(false);
+  };
+
+  const handleChange = useCallback((e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }, [formData]);
+
+  const filteredProducts = useMemo(() => {
+    return productList.filter(product =>
+      product.product_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [productList, searchQuery]);
+
+  const paginatedProducts = useMemo(() => {
+    return filteredProducts.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  }, [filteredProducts, currentPage]);
+
+  const handlePageChange = (event, newPage) => setCurrentPage(newPage);
+  const handleSearch = (event) => setSearchQuery(event.target.value);
+
+  return (
+    <div>
+      <SideBar />
+      <Typography className="text-center text-3xl font-semibold mt-5 mb-3 bg-pink-500 bg-clip-text text-transparent">
+        Product Management
+      </Typography>
+      <div className="flex justify-center items-center py-3">
+        <Button onClick={handleOpen}>Add Product</Button>
+      </div>
+      <div className="flex items-end justify-start w-96 mb-3">
+        <Input
+          type="search"
+          label="Search Here"
+          value={searchQuery}
+          onChange={handleSearch}
+          className="w-96"
+        />
+      </div>
+
+      <Dialog open={open} handler={handleOpen} size="sm">
+        <div className='max-h-96 overflow-y-auto'>
+          <DialogHeader>Add Product</DialogHeader>
+          <DialogBody className='flex flex-col gap-3 '>
+            <Input
+              name="product_name"
+              type="text"
+              label="Name for Product"
+              className='border-[1px] border-black'
+              value={formData.product_name}
+              onChange={handleChange}
+              required
+            />
+            <select
+              name="product_category"
+              className="h-10 w-full border-[1px] border-black rounded-lg"
+              value={formData.product_category}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select A Category</option>
+              {fetchCategory.map(category => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
+            </select>
+            <Input name="product_price" type="number" className='border-[1px] border-black' label="Enter Price" value={formData.product_price} onChange={handleChange} required />
+            <Input name="product_offer" type="number" className='border-[1px] border-black' label="Enter Offer %" value={formData.product_offer} onChange={handleChange} required />
+            <Input name="product_count" type="number" className='border-[1px] border-black' label="Enter Product Count" value={formData.product_count} onChange={handleChange} required />
+            <Input name="product_description" type="text" className='border-[1px] border-black' label="Write Description Here" value={formData.product_description} onChange={handleChange} required />
+            <Input type="file" label="Upload Images" className='border-[1px] border-black' accept="image/*" multiple onChange={handleFileChange} required />
+          </DialogBody>
+
+          {previews.length > 0 && (
+            <DialogFooter>
+              <div className="grid grid-cols-3 gap-4">
+                {previews.map((preview, index) => (
+                  <img key={index} src={preview} alt={`Preview ${index}`} className="w-40 h-24 object-cover border border-black" />
+                ))}
+              </div>
+              <div className="flex mt-2">
+                <Button onClick={handleOpen} className="mr-1 bg-red-500">Close</Button>
+                <Button onClick={handleUpload} color="green">Confirm</Button>
+              </div>
+            </DialogFooter>
+          )}
+        </div>
+      </Dialog>
+
+      <TableContainer className="border-[1px] border-[#565454] w-screen rounded-3xl px-3 pr-3">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Stock</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Edit</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedProducts.map(product => (
+              <TableRow key={product.id} className="hover:bg-yellow-200">
+                <TableCell>{product.id}</TableCell>
+                <TableCell><img src={product.images[0].image} alt="Product" className="w-16 h-16" /></TableCell>
+                <TableCell>{product.product_name}</TableCell>
+                <TableCell>{product.product_count}</TableCell>
+                <TableCell>₹ {product.product_price}</TableCell>
+                <TableCell><Button onClick={(e) =>updateHandleProduct(product.id)}>Edit</Button></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div className="flex justify-center items-center mt-4">
+          <Pagination
+            count={Math.ceil(filteredProducts.length / rowsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+          />
+        </div>
+      </TableContainer>
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default Product;

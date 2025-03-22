@@ -1,0 +1,272 @@
+// import React, { useEffect, useState } from 'react'
+// import { Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+// import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
+// import SideBar from '../SideBar/SideBar';
+// import { Dialog, DialogHeader, DialogBody, DialogFooter, Button, Typography, Input,Switch } from "@material-tailwind/react";
+// import { getCategoryData, getProductData, getProductDataById, postProductsData } from '../../../Api/AdminApi';
+// import { toast, ToastContainer } from 'react-toastify';
+// import { Try } from '@mui/icons-material';
+
+
+// function Product() {
+//     const [formData, setFormData] = useState();
+//     const [productName, setProductName] = useState("")
+//     const [fetchCategory, setFetchCategory] = useState([])
+//     const [selectedCategory, setSelectedCategory] = useState("")
+//     const [productPrice, setProductPrice] = useState()
+//     const [productCount, setProductCount] = useState()
+//     const [productOffer, setProductOffer] = useState()
+//     const [productDescription, setProductDiscription] = useState("")
+//     const [open, setOpen] = useState(false);
+//     const [updateOpenModal,setUpdateOpenModal] = useState(false)
+//     const [images, setImages] = useState([]);
+//     const [previews, setPreviews] = useState([]);
+//     const [productList, setProductList] = useState([])
+//     const [currentPage, setCurrentPage] = useState(1)
+//     const [searchQuery, setSearchQuery] = useState('')
+//     const [isActive,setIsActive] = useState(false)
+//     const [productId,setProductId] = useState(null)
+
+//     const fetchCategoryName = async () => {
+//         try {
+//             const response = await getCategoryData();
+//             const categoryNames = response.map((category) => ({ id: category.id, name: category.category_name }))
+//             setFetchCategory(categoryNames)
+//         } catch (error) {
+//             console.error("an error occured in fetching category", error);
+//         }
+//     }
+
+//     const fetchProductList = async () => {
+//         try {
+//             const response = await getProductData()
+//             setProductList(response)
+//         } catch (error) {
+//             console.error("an Error Occured");
+//         }
+//     }
+
+
+//     useEffect(() => {
+//         fetchCategoryName();
+//         fetchProductList();
+//     }, [])
+
+
+//     const handleFileChange = (e) => {
+//         const selectedFiles = Array.from(e.target.files);
+//         setImages(selectedFiles)
+
+//         const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+//         setPreviews(newPreviews)
+//     }
+
+
+
+
+//     const handleUpload = async (e) => {
+//         e.preventDefault()
+//         const formData = new FormData();
+//         formData.append("product_name", productName)
+//         formData.append("product_category", selectedCategory)
+//         formData.append("product_price", productPrice)
+//         formData.append("product_count", productCount)
+//         formData.append("product_offer", productOffer)
+//         formData.append("product_description", productDescription)
+//         formData.append("product_status", true)
+//         images.forEach((file) => {
+//             formData.append("uploaded_images", file);
+//         });
+
+//         try {
+//             const response = await postProductsData(formData);
+//             toast.success('Uploaded Product Successfully !');
+//             setProductName("")
+//             setSelectedCategory("")
+//             setProductPrice(null)
+//             setProductOffer(null)
+//             setProductCount(null)
+//             setProductDiscription("")
+//             setImages([])
+//             setOpen(false)
+//             // setIsActive(false)
+//             setPreviews([])
+//         } catch (error) {
+//             toast.error('Error uploading images !');
+//         }
+//     };
+
+
+//     const handleOpen = () => setOpen(!open);
+
+
+//     // pagination and sorting 
+//     const rowsPerPage = 5
+//     const filteredProducts = productList.filter(product =>
+//         product.product_name.toLowerCase().includes(searchQuery.toLowerCase())
+//     );
+
+//     const paginatedProducts = filteredProducts.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+
+//     const handlePageChange = (event, newPage) => setCurrentPage(newPage);  
+//     const handleSearch = (event) => {
+//         setSearchQuery(event.target.value)
+//         setCurrentPage(1)
+//     }
+
+//     return (
+//         <div>
+//             <SideBar/>
+//             <Typography className="text-center text-3xl font-semibold  mt-5 mb-3 bg-pink-500 bg-clip-text text-transparent">
+//                 Product Management
+//             </Typography>
+//             <div className="flex justify-center items-center py-3">
+//                 <Button onClick={handleOpen}>Add Product</Button>
+//             </div>
+
+//             <div className="flex items-end justify-start w-96 mb-3">
+//                 <div>
+//                     <Input
+//                         type="search"
+//                         label="Search Here"
+//                         value={searchQuery}
+//                         onChange={handleSearch}
+//                         className="w-96"
+//                     />
+//                 </div>
+//             </div>
+
+//             <Dialog open={open} handler={handleOpen} size="sm" >
+//                 <div className='max-h-96 overflow-y-auto'>
+//                     <DialogHeader>Add Product</DialogHeader>
+//                     <div className="px-3 flex flex-col gap-3">
+
+//                         <Input type='text' label='Name for Product'
+//                             value={productName}
+//                             onChange={(e) => setProductName(e.target.value)}
+//                             required
+//                         />
+//                         <select
+//                             className='h-10  border-[1px] rounded-lg'
+//                             label='Select Category Here'
+//                             value={selectedCategory}
+//                             onChange={(e) => setSelectedCategory(e.target.value)}
+//                             required
+//                         >
+//                             <option value="">Select A category</option>
+//                             {fetchCategory.map((category) => (
+//                                 <option key={category.id} value={category.id}>
+//                                     {category.name}
+//                                 </option>
+//                             ))}
+//                         </select>
+//                         <Input
+//                             type='number'
+//                             label='Enter price Here'
+//                             value={productPrice}
+//                             onChange={(e) => setProductPrice(e.target.value)} 
+//                             required
+//                             />
+//                         <Input
+//                             type='number'
+//                             label='Enter Offer %'
+//                             value={productOffer}
+//                             onChange={(e) => setProductOffer(e.target.value)} 
+//                             required
+//                             />
+//                         <Input
+//                             type='number'
+//                             label='Enter Product Count'
+//                             value={productCount}
+//                             onChange={(e) => setProductCount(e.target.value)} 
+//                             required
+//                             />
+//                         <Input
+//                             type='text'
+//                             label='Write Description Here'
+//                             value={productDescription}
+//                             onChange={(e) => setProductDiscription(e.target.value)} 
+//                             required
+//                             />
+//                         <Input
+//                             type='file'
+//                             label='Upload Images Here'
+//                             accept='image/*'
+//                             multiple onChange={handleFileChange}
+//                             required
+//                         />
+//                     </div>
+
+//                     <DialogFooter className='flex flex-col'>
+//                         {previews.length > 0 && (
+//                             <div className="grid grid-cols-3 gap-4">
+//                                 {previews.map((preview, index) => (
+//                                     <div key={index} className="  flex justify-center items-center border-[1px] border-black ">
+//                                         <img src={preview} alt={`Preview ${index}`} className="w-40 h- 24 object-cover" />
+//                                     </div>
+//                                 ))}
+//                             </div>
+//                         )}
+//                         <div className='flex mt-2'>
+//                             <Button onClick={handleOpen} className="mr-1 bg-red-500">
+//                                 Close
+//                             </Button>
+//                             <Button variant="gradient" color="green" onClick={handleUpload}>
+//                                 Confirm
+//                             </Button>
+//                         </div>
+//                     </DialogFooter>
+//                 </div>
+//             </Dialog>
+
+//             <div className="px-3 pr-3">
+//                 {filteredProducts.length > 0 ? (
+//                     <TableContainer className="border-[1px] border-[#565454] w-screen rounded-3xl">
+//                         <Table>
+//                             <TableHead>
+//                                 <TableRow>
+//                                     <TableCell className="text-left">id</TableCell>
+//                                     <TableCell className="text-left">Image</TableCell>
+//                                     <TableCell className="text-left">Name</TableCell>
+//                                     <TableCell className="text-left">stock</TableCell>
+//                                     <TableCell className="text-left">Price</TableCell>
+//                                     <TableCell className="text-left">Edit</TableCell>
+//                                     <TableCell className="text-left">Status</TableCell>
+
+//                                 </TableRow>
+//                             </TableHead>
+//                             <TableBody>
+//                                 {paginatedProducts.map((product) => (
+//                                     <TableRow key={product.id} className="hover:bg-yellow-200">
+//                                         <TableCell>{product.id}</TableCell>
+//                                         <TableCell><img src={product.images[0].image} alt="img_row" className="w-16 h-16" /> </TableCell>
+//                                         <TableCell>{product.product_name}</TableCell>
+//                                         <TableCell >{product.product_count}</TableCell>
+//                                         <TableCell>₹ {product.product_price}</TableCell>
+//                                         <TableCell><Button>Edit</Button></TableCell>
+//                                         <TableCell>{ }</TableCell>
+//                                     </TableRow>
+//                                 ))}
+
+//                             </TableBody>
+//                         </Table>
+//                         <div className='flex justify-center items-center'>
+//                             <Pagination
+//                                 count={Math.ceil(filteredProducts.length / rowsPerPage)}
+//                                 page={currentPage}
+//                                 onChange={handlePageChange}
+//                                 className="mt-4"
+//                             />
+//                         </div>
+//                     </TableContainer>
+//                 ) : (
+//                     <Typography className='text-center text-4xl text-red-500'>Products not found</Typography>
+//                 )}
+//                 <ToastContainer />
+//             </div>
+//         </div>
+//     );
+// }
+
+// export default Product;
+
