@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import BannerGlovista from "../../assets/Banners/Why_Glovista.jpg";
+import Banner1 from "../../assets/Banners/banner 10.jpg";
+import Banner2 from "../../assets/Banners/Banner 11.jpg";
+import Banner3 from "../../assets/Banners/banner 12.jpg";
 import Banner from "../../../public/dummies/Banner.jpg";
 
 function Why_Us() {
@@ -111,7 +114,7 @@ function Why_Us() {
             transform="translate(0.5 0.5)"
             fill="none"
             stroke="#349e89"
-            stroke-width="1"
+            strokeWidth="1"
           >
             <ellipse
               cx="31.002"
@@ -119,9 +122,9 @@ function Why_Us() {
               rx="31.002"
               ry="31.002"
               transform="translate(74.007 4.004)"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-dasharray="0 5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="0 5"
             />
             <path
               d="M470.635,90.27l4.3,8.721a.714.714,0,0,0,.545.389l9.622,1.4a.727.727,0,0,1,.4,1.235l-6.964,6.786a.745.745,0,0,0-.211.634l1.646,9.589a.718.718,0,0,1-1.046.756l-8.61-4.527a.709.709,0,0,0-.667,0l-8.61,4.527a.718.718,0,0,1-1.046-.756l1.646-9.589a.685.685,0,0,0-.211-.634l-6.964-6.786a.728.728,0,0,1,.4-1.235l9.622-1.4a.733.733,0,0,0,.545-.389l4.3-8.721a.72.72,0,0,1,1.29,0Z"
@@ -377,9 +380,11 @@ function Why_Us() {
 
           <div className="text-center mt-16 max-w-4xl mx-auto">
             <p className="text-3xl">
-              Dermatouch works on these principles to provide the best skincare
-              solutions to become the{" "}
-              <strong className="font-bold">best versions of ourselves.</strong>
+              At Glovista, we follow these principles to create the best
+              skincare solutions {""}
+              <strong className="font-bold">
+                helping you feel confident and radiant every day.
+              </strong>
             </p>
           </div>
         </div>
@@ -389,48 +394,64 @@ function Why_Us() {
         <p className="text-5xl text-center mt-10">
           Our <b>Philosophy</b>
         </p>
-        <p className="w-3/5 mx-auto text-center mt-5">
-          For Dermatouch, beauty is not only skin deep but goes beyond that. Our
-          mission is to provide our customers with the right ingredients and the
-          right formulations.
+        <p className="w-3/5 mx-auto text-center mt-5 font-albert">
+          At Glovista, we believe that beauty goes beyond the surface. Our goal
+          is to provide the right ingredients and formulations to help you
+          achieve healthy, radiant skin.
         </p>
-        <div className="flex flex-wrap sm:flex-nowrap rounded-lg w-3/4 items-center justify-center mx-auto mt-10 gap-3 ">
-          <div className="w-30">
-            <div>
+        <div className="flex flex-wrap sm:flex-nowrap rounded-lg w-3/4 items-center justify-center mx-auto mt-10 gap-3">
+          <div className="h-auto w-[22rem]">
+            <div className="h-[14rem]">
               <img
                 src="https://dermatouch.com/cdn/shop/files/Our_Mission_900x569.jpg?v=1678437736"
                 alt=""
+                className="w-full h-full object-cover rounded-t-xl"
               />
             </div>
             <div className="bg-amber-50 flex flex-col items-center justify-center p-5 rounded-b-xl">
               <h1>
                 Our <b>Mission</b>
               </h1>
-              <p className="text-center h-16">
-                Our mission is to provide our customers with the right
-                ingredients and the right formulations.
+              <p className="text-center h-auto">
+                Our mission is simple—deliver effective skincare solutions with
+                the right ingredients and science-backed formulations.
               </p>
             </div>
           </div>
-          <div className="w-30 rounded-3xl">
-            <div>
+
+          <div className="h-auto w-[22rem]">
+            <div className="h-[14rem]">
               <img
                 src="https://dermatouch.com/cdn/shop/files/Our_Belief_900x569.jpg?v=1678437756"
                 alt=""
+                className="w-full h-full object-cover rounded-t-xl"
               />
             </div>
             <div className="bg-yellow-100 flex flex-col items-center justify-center p-5 rounded-b-xl">
               <h1>
                 Our <b>Belief</b>
               </h1>
-              <p className="text-center h-16">
-                Dermatouch believes that skincare is not only about the product,
-                but it is also about the ingredients used in it.
+              <p className="text-center">
+                We believe that great skincare isn’t just about the product—it’s
+                about using the right ingredients that truly make a difference.
               </p>
             </div>
           </div>
         </div>
       </section>
+
+      <div className="my-10">
+        <div className="grid grid-cols-2 gap-4">
+          <img src={Banner1} alt="Banner 1" className="w-full h-auto" />
+          <img src={Banner2} alt="Banner 2" className="w-full h-auto" />
+
+          <img
+            src={Banner3}
+            alt="Banner 3"
+            className="col-span-2 w-full h-auto"
+          />
+        </div>
+      </div>
     </div>
   );
 }
